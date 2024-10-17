@@ -8,13 +8,17 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #2e2e2e;
+            /* Dark background */
+            color: #f4f4f4;
+            /* Light text color */
             margin: 0;
             padding: 10px;
         }
 
         h1 {
-            color: #333;
+            color: #ffffff;
+            /* White for headings */
             text-align: center;
             font-size: 18px;
             margin-bottom: 10px;
@@ -23,10 +27,11 @@
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background: white;
+            background: #3e3e3e;
+            /* Darker background for the container */
             padding: 10px;
             border-radius: 6px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
         }
@@ -37,10 +42,15 @@
             width: 100%;
             padding: 6px;
             margin: 4px 0;
-            border: 1px solid #ccc;
+            border: 1px solid #555;
+            /* Darker border */
             border-radius: 4px;
             box-sizing: border-box;
             font-size: 12px;
+            background-color: #2e2e2e;
+            /* Dark background for inputs */
+            color: #f4f4f4;
+            /* Light text for inputs */
         }
 
         .header-key,
@@ -48,9 +58,14 @@
             width: calc(50% - 5px);
             padding: 6px;
             margin: 0 3px 4px 0;
-            border: 1px solid #ccc;
+            border: 1px solid #555;
+            /* Darker border */
             border-radius: 4px;
             box-sizing: border-box;
+            background-color: #2e2e2e;
+            /* Dark background for headers */
+            color: #f4f4f4;
+            /* Light text for headers */
         }
 
         #headerContainer {
@@ -115,16 +130,20 @@
         }
 
         pre {
-            background-color: #f9f9f9;
+            background-color: #1e1e1e;
+            /* Dark background for preformatted text */
             padding: 8px;
             border-radius: 4px;
-            border: 1px solid #e1e1e1;
+            border: 1px solid #555;
+            /* Darker border */
             overflow: auto;
             white-space: pre-wrap;
             margin-top: 8px;
             font-size: 12px;
             max-height: 300px;
             overflow-y: auto;
+            color: #f4f4f4;
+            /* Light text for preformatted text */
         }
 
         /* Responsive Design */
@@ -232,65 +251,65 @@
                         JSON.parse(data); // Try to parse the JSON
                     } catch (error) {
                         responsePre.innerText = `Error: Invalid JSON format. ${error.message}`;
-                                return; // Stop processing if JSON is invalid
-                            }
-                        }
+                        return; // Stop processing if JSON is invalid
+                    }
+                }
 
-                        vscode.postMessage({
-                            command: 'sendRequest',
-                            baseUrl,
-                            endpoint,
-                            method,
-                            data: method === 'GET' || method === 'DELETE' ? null : JSON.parse(data),
-                            headers
-                        });
-                    });
-                    document.getElementById('save').addEventListener('click', () => {
-                        const baseUrl = document.getElementById('baseUrl').value;
-                        const endpoint = document.getElementById('endpoint').value;
-                        const method = document.getElementById('method').value;
-                        const data = document.getElementById('data').value;
-
-                        // Collect headers
-                        const headers = {};
-                        const headerKeys = document.querySelectorAll('.header-key');
-                        const headerValues = document.querySelectorAll('.header-value');
-                        headerKeys.forEach((key, index) => {
-                            if (key.value) {
-                                headers[key.value] = headerValues[index].value;
-                            }
-                        });
-
-                        vscode.postMessage({
-                            command: 'saveRequest',
-                            baseUrl,
-                            endpoint,
-                            method,
-                            data: method === 'GET' || method === 'DELETE' ? null : data,
-                            headers
-                        });
-                    });
+                vscode.postMessage({
+                    command: 'sendRequest',
+                    baseUrl,
+                    endpoint,
+                    method,
+                    data: method === 'GET' || method === 'DELETE' ? null : JSON.parse(data),
+                    headers
                 });
-             window.addEventListener('message', event => {
-                    const message = event.data;
-                    switch (message.command) {
-                        case 'showResponse':
-                            document.getElementById('response').innerText = JSON.stringify(message.response, null, 2);
-                            break;
-                        case 'showError':
-                            document.getElementById('response').innerText = `Error: ${ message.error } `;
-                            break;
-                        case 'loadRequests':
-                            const requestsContainer = document.getElementById('savedRequestsContainer');
-                            requestsContainer.innerHTML  = '';
-                            message.requests.forEach(request => {
-                                const requestDiv = document.createElement('div');
-                                requestDiv.innerText = `${request.method} ${request.baseUrl}${request.endpoint} ${request.data} ${JSON.stringify(request.headers)}`;
-                                requestsContainer.appendChild(requestDiv);
-                            });
-                            break;
+            });
+            document.getElementById('save').addEventListener('click', () => {
+                const baseUrl = document.getElementById('baseUrl').value;
+                const endpoint = document.getElementById('endpoint').value;
+                const method = document.getElementById('method').value;
+                const data = document.getElementById('data').value;
+
+                // Collect headers
+                const headers = {};
+                const headerKeys = document.querySelectorAll('.header-key');
+                const headerValues = document.querySelectorAll('.header-value');
+                headerKeys.forEach((key, index) => {
+                    if (key.value) {
+                        headers[key.value] = headerValues[index].value;
                     }
                 });
+
+                vscode.postMessage({
+                    command: 'saveRequest',
+                    baseUrl,
+                    endpoint,
+                    method,
+                    data: method === 'GET' || method === 'DELETE' ? null : data,
+                    headers
+                });
+            });
+        });
+        window.addEventListener('message', event => {
+            const message = event.data;
+            switch (message.command) {
+                case 'showResponse':
+                    document.getElementById('response').innerText = JSON.stringify(message.response, null, 2);
+                    break;
+                case 'showError':
+                    document.getElementById('response').innerText = `Error: ${message.error} `;
+                    break;
+                case 'loadRequests':
+                    const requestsContainer = document.getElementById('savedRequestsContainer');
+                    requestsContainer.innerHTML = '';
+                    message.requests.forEach(request => {
+                        const requestDiv = document.createElement('div');
+                        requestDiv.innerText = `${request.method} ${request.baseUrl}${request.endpoint} ${request.data} ${JSON.stringify(request.headers)}`;
+                        requestsContainer.appendChild(requestDiv);
+                    });
+                    break;
+            }
+        });
     </script>
 </body>
 
