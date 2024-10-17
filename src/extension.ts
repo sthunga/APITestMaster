@@ -47,7 +47,18 @@ export function activate(context: vscode.ExtensionContext) {
 async function handleSendRequest(message: any, panel: vscode.WebviewPanel) {
     const { baseUrl, endpoint, method, data, headers } = message;
     try {
-        const response = await axios({ method: method, url: `${baseUrl}${endpoint}`, data: data, headers: headers });
+        const config: any = {
+            method: method,
+            url: `${baseUrl}${endpoint}`,
+            headers: headers,
+        };
+
+        // Include data only for POST and PUT requests
+        if (method === 'POST' || method === 'PUT') {
+            config.data = data; // Only include if needed
+        }
+
+        const response = await axios(config);
         panel.webview.postMessage({ command: 'showResponse', response: response.data });
     } catch (error: any) {
         panel.webview.postMessage({ command: 'showError', error: error.message });

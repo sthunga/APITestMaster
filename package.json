@@ -1,8 +1,13 @@
 {
-  "name": "apitestmaster",
-  "displayName": "APITestMaster",
+  "name": "api-test-master",
+  "displayName": "API Test Master",
   "description": "The APITestMaster is a Visual Studio Code extension designed to streamline the process of testing RESTful APIs directly from the code editor. With a user-friendly interface, it allows developers and testers to send requests, manage headers, and view responses all in one place, enhancing productivity and simplifying API interactions.",
-  "version": "0.0.1",
+  "version": "1.0.2",
+  "publisher": "BytePal",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sthunga/APITestMaster.git"
+  },
   "engines": {
     "vscode": "^1.94.0"
   },
