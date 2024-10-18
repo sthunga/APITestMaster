@@ -24,6 +24,17 @@
             margin-bottom: 10px;
         }
 
+        h2 {
+            color: #ffffff;
+            /* Header color */
+            text-align: center;
+            /* Center align the header */
+            margin-bottom: 10px;
+            /* Space below the header */
+            font-size: 20px;
+            /* Adjust font size */
+        }
+
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -55,17 +66,10 @@
 
         .header-key,
         .header-value {
-            width: calc(50% - 5px);
-            padding: 6px;
-            margin: 0 3px 4px 0;
-            border: 1px solid #555;
-            /* Darker border */
-            border-radius: 4px;
-            box-sizing: border-box;
-            background-color: #2e2e2e;
-            /* Dark background for headers */
-            color: #f4f4f4;
-            /* Light text for headers */
+            flex: 1;
+            /* Allow inputs to grow and take available space */
+            margin-right: 8px;
+            /* Add space between input fields and delete icon */
         }
 
         #headerContainer {
@@ -78,6 +82,7 @@
             display: flex;
             align-items: center;
             margin-bottom: 4px;
+            position: relative;
         }
 
         .plus-icon {
@@ -113,6 +118,30 @@
             left: 5px;
         }
 
+        .delete-icon {
+            display: none;
+            /* Initially hidden */
+            width: 18px;
+            height: 18px;
+            background-color: red;
+            /* Change color as needed */
+            border-radius: 3px;
+            position: absolute;
+            /* Position it absolutely within the header row */
+            right: 5px;
+            /* Position it a bit from the right edge */
+            top: 50%;
+            /* Center vertically */
+            transform: translateY(-50%);
+            /* Adjust for vertical centering */
+            cursor: pointer;
+        }
+
+        .header-row:hover .delete-icon {
+            display: block;
+            /* Show delete icon on hover */
+        }
+
         button {
             background-color: #007acc;
             color: white;
@@ -146,6 +175,58 @@
             /* Light text for preformatted text */
         }
 
+        #savedRequestsContainer {
+            margin-top: 10px;
+        }
+
+        .request-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            background-color: #3e3e3e;
+            transition: background-color 0.3s;
+        }
+
+        .request-method,
+        .request-url,
+        .request-data,
+        .request-headers {
+            overflow: hidden;
+            /* Hide overflow */
+            white-space: normal;
+            /* Allow text to wrap */
+        }
+
+        .request-row:hover {
+            background-color: #505050;
+            /* Highlight on hover */
+        }
+
+        .request-method {
+            flex: 1;
+            font-weight: bold;
+        }
+
+        .request-url {
+            flex: 3;
+            word-wrap: break-word;
+            /* Allow breaking for long URLs */
+        }
+
+
+        .request-data {
+            flex: 2;
+        }
+
+        .request-headers {
+            flex: 3;
+            word-wrap: break-word;
+            /* Allow breaking for long headers */
+        }
+
         /* Responsive Design */
         @media (max-width: 600px) {
             .container {
@@ -177,6 +258,7 @@
             <div class="header-row">
                 <input type="text" class="header-key" placeholder="Header Key" />
                 <input type="text" class="header-value" placeholder="Header Value" />
+                <span class="delete-icon" title="Delete Header" onclick="deleteHeader(this)">✖</span>
             </div>
             <span id="addHeader" class="plus-icon" title="Add Header"></span>
         </div>
@@ -184,6 +266,7 @@
         <button id="send">Send Request</button>
         <button id="save">Save Request</button>
         <pre id="response"></pre>
+        <h2>Saved Requests</h2>
         <div id="savedRequestsContainer"></div>
     </div>
     <script>
@@ -223,8 +306,17 @@
                 headerValueInput.className = 'header-value';
                 headerValueInput.placeholder = 'Header Value';
 
+                const deleteIcon = document.createElement('span');
+                deleteIcon.className = 'delete-icon';
+                deleteIcon.title = 'Delete Header';
+                deleteIcon.innerText = '✖';
+                deleteIcon.onclick = function () {
+                    deleteHeader(deleteIcon);
+                };
+
                 headerRow.appendChild(headerKeyInput);
                 headerRow.appendChild(headerValueInput);
+                headerRow.appendChild(deleteIcon);
                 headerContainer.insertBefore(headerRow, addHeader); // Insert new header row before the plus icon
             });
 
@@ -304,12 +396,36 @@
                     requestsContainer.innerHTML = '';
                     message.requests.forEach(request => {
                         const requestDiv = document.createElement('div');
-                        requestDiv.innerText = `${request.method} ${request.baseUrl}${request.endpoint} ${request.data} ${JSON.stringify(request.headers)}`;
+                        requestDiv.className = 'request-row';
+                        requestDiv.innerHTML = `<span class="request-method">${request.method}</span>
+                                                <span class="request-url">${request.baseUrl}${request.endpoint}</span>
+                                                <span class="request-data">${request.data || ''}</span>
+                                                <span class="request-headers">${JSON.stringify(request.headers)}</span>
+                                                `;
                         requestsContainer.appendChild(requestDiv);
                     });
+
                     break;
             }
         });
+        function deleteHeader(deleteIcon) {
+            const headerRow = deleteIcon.parentElement;
+            const headerKeyInput = headerRow.querySelector('.header-key');
+            const headerValueInput = headerRow.querySelector('.header-value');
+            const headerContainer = document.getElementById('headerContainer');
+
+            // Clear the input fields
+            headerKeyInput.value = '';
+            headerValueInput.value = '';
+
+            // Prevent deletion if it's the last header row
+            if (headerContainer.childElementCount <= 2) { // 1 for addHeader, 1 for the current row
+                alert('Cannot delete the last header row.');
+                return;
+            }
+
+            headerContainer.removeChild(headerRow);
+        }
     </script>
 </body>
 
