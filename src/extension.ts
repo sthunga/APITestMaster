@@ -36,6 +36,9 @@ export function activate(context: vscode.ExtensionContext) {
                     case 'saveRequest':
                         await handleSaveRequest(message, context, panel);
                         break;
+                    case 'deleteRequest':
+                        await handleDeleteRequest(context, panel, message.index);
+                        break;
                 }
             },
             undefined,
@@ -80,6 +83,13 @@ async function handleSaveRequest(message: any, context: vscode.ExtensionContext,
     storedRequests.push(newRequest);
     await context.globalState.update('savedRequests', storedRequests);
     panel.webview.postMessage({ command: 'loadRequests', requests: storedRequests });
+}
+
+async function handleDeleteRequest(context: vscode.ExtensionContext, panel: vscode.WebviewPanel, deleteIndex: number) {
+    const savedRequests = (await context.globalState.get<ApiRequest[]>('savedRequests', [])) || [];
+    savedRequests.splice(deleteIndex, 1);
+    await context.globalState.update('savedRequests', savedRequests);
+    panel.webview.postMessage({ command: 'loadRequests', requests: savedRequests });
 }
 
 function getWebviewContent(context: vscode.ExtensionContext) {

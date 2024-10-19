@@ -456,7 +456,7 @@
                 case 'loadRequests':
                     const requestsContainer = document.getElementById('savedRequestsContainer');
                     requestsContainer.innerHTML = '';
-                    message.requests.forEach(request => {
+                    message.requests.forEach((request, index) => {
                         const requestDiv = document.createElement('div');
                         requestDiv.className = 'request-row';
                         requestDiv.innerHTML = `<div class="request-details">
@@ -466,6 +466,7 @@
                                                     <span class="request-headers">${JSON.stringify(request.headers)}</span>
                                                 </div>
                                                 <button class="use-request" onclick='useRequest(${JSON.stringify(request)})'>Use This Request</button>
+                                                <button class="delete-request" onclick='deleteRequest(${index})'>Delete This Request</button>
                                                 `;
                         requestsContainer.appendChild(requestDiv);
                     });
@@ -524,6 +525,14 @@
 
             // Optionally, you can scroll to the top of the form to see the populated fields
             document.body.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function deleteRequest(index) {
+            // Remove from global state
+            vscode.postMessage({
+                command: 'deleteRequest',
+                index: index
+            });
         }
 
     </script>
